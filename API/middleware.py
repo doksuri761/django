@@ -1,10 +1,8 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
-from django.shortcuts import HttpResponse
+from django.http import HttpResponse
 from dotenv import load_dotenv
 import os
 import twitter
-
+from API import views
 
 load_dotenv(dotenv_path='./.env', verbose=False)
 
@@ -20,14 +18,15 @@ twitter_api = twitter.Api(consumer_key=twitter_consumer_key,
 query = "#stopasianhate"
 
 
-def main(request):
-    print(request.get_host())
-    test = [request.get_host(), request.get_raw_uri()]
-    return HttpResponse(str(test))
+class HealthCheckMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-
-def api(request, lang):
-    statuse = twitter_api.GetSearch(term=query, count=1, lang=lang)
-    print(request.get_host())
-    return HttpResponse(statuse)
-
+    def __call__(self, request):
+        if request.path == "/API":
+            statuse = twitter_api.GetSearch(term=query, count=1)
+            print(request.get_host())
+            return HttpResponse(statuse)
+        elif request.path == '/'
+        response = self.get_response(request)
+        return response
